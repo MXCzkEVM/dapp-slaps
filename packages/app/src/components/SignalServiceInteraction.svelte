@@ -1,13 +1,13 @@
 <script lang="ts">
   // imports
   import { readContract, prepareWriteContract, writeContract, getAccount } from "@wagmi/core";
-  import { signalServiceConfig, taikoL2Config } from "../generated";
+  import { signalServiceConfig, mxcl2Config } from "../generated";
   import { ethers } from "ethers";
-  import { sepolia } from "@wagmi/core/chains";
-  import { taiko } from "../domain/chain";
+  import { arbitrumGoerli } from "@wagmi/core/chains";
+  import { mxc } from "../domain/chain";
   import { providers } from "../stores";
   import { RLP } from "ethers/lib/utils";
-  import type { BlockHeader } from "../domain/sepoliaBlock";
+  import type { BlockHeader } from "../domain/block";
 
   // variables
   let signalToSend = "";
@@ -17,11 +17,11 @@
   // functions
   async function sendSignal() {
     const config = await prepareWriteContract({
-      address: signalServiceConfig.address[sepolia.id],
+      address: signalServiceConfig.address[arbitrumGoerli.id],
       abi: signalServiceConfig.abi,
       functionName: "sendSignal",
       args: [ethers.utils.formatBytes32String(signalToSend) as `0x${string}`], // TODO
-      chainId: sepolia.id,
+      chainId: arbitrumGoerli.id,
     });
     await writeContract(config);
   }
@@ -32,13 +32,13 @@
 
     // 1. get the latest synced header of the other chain
     const latestSyncedHeaderHash = await readContract({
-      address: taikoL2Config.address[taiko.id],
-      abi: taikoL2Config.abi,
+      address: mxcl2Config.address[mxc.id],
+      abi: mxcl2Config.abi,
       functionName: "getLatestSyncedHeader",
-      chainId: taiko.id,
+      chainId: mxc.id,
     });
 
-    const block = await $providers[sepolia.id].send("eth_getBlockByHash", [
+    const block = await $providers[arbitrumGoerli.id].send("eth_getBlockByHash", [
       latestSyncedHeaderHash,
       false,
     ]);
@@ -68,8 +68,8 @@
     };
 
     // 2. get the merkle proof for the signal at the specified synced block hash
-    let proof = await $providers[sepolia.id].send("eth_getProof", [
-      signalServiceConfig.address[sepolia.id],
+    let proof = await $providers[arbitrumGoerli.id].send("eth_getProof", [
+      signalServiceConfig.address[arbitrumGoerli.id],
       [
         ethers.utils.keccak256(
           ethers.utils.solidityPack(
@@ -90,24 +90,24 @@
     // 4. return the signal proof
     let signalProof = ethers.utils.defaultAbiCoder.encode(
       [
-        "tuple(tuple(bytes32 parentHash, bytes32 ommersHash, address beneficiary, bytes32 stateRoot, bytes32 transactionsRoot, bytes32 receiptsRoot, bytes32[8] logsBloom, uint256 difficulty, uint128 height, uint64 gasLimit, uint64 gasUsed, uint64 timestamp, bytes extraData, bytes32 mixHash, uint64 nonce, uint256 baseFeePerGas, bytes32 withdrawalsRoot) header, bytes proof)",
-      ],
+        'tuple(tuple(bytes32 parentHash, bytes32 ommersHash, address beneficiary, bytes32 stateRoot, bytes32 transactionsRoot, bytes32 receiptsRoot, bytes32[8] logsBloom, uint256 difficulty, uint128 height, uint64 gasLimit, uint64 gasUsed, uint64 timestamp, bytes extraData, bytes32 mixHash, uint64 nonce, uint256 baseFeePerGas, bytes32 withdrawalsRoot) header, bytes proof)',      ],
       [{ header: blockHeader, proof: encodedProof }]
     );
+    console.log(signalProof);
 
     // 5. verify signal proof
 
     isSignalReceivedMessage = (await readContract({
-      address: signalServiceConfig.address[taiko.id],
+      address: signalServiceConfig.address[mxc.id],
       abi: signalServiceConfig.abi,
       functionName: "isSignalReceived",
       args: [
-        ethers.BigNumber.from(sepolia.id),
+        ethers.BigNumber.from(arbitrumGoerli.id),
         signalSenderAddress as `0x${string}`,
         ethers.utils.formatBytes32String(signalToVerify) as `0x${string}`,
         signalProof as `0x${string}`,
       ],
-      chainId: taiko.id,
+      chainId: mxc.id,
     }))
       ? "true"
       : "false";
@@ -119,21 +119,21 @@
   <strong> Steps: </strong>
   <ol>
     <li>
-      <strong><u>Connect your wallet (to Sepolia) and make sure you have some SepETH </u></strong
-      >(<a href="https://sepolia-faucet.pk910.de/" target="_blank" rel="noreferrer">Faucet ↗</a>)
+      <strong><u>Connect your wallet (to Arbitrum Goerli) and make sure you have some GoerliETH </u></strong
+      >(<a href="https://wannsee.mxc.com/docs/Tutorials/receive-tokens" target="_blank" rel="noreferrer">Faucet ↗</a>)
     </li>
     <li>Enter a message, and click "Send signal"</li>
     <li>Wait about ~5 mins (currently configured L2 block derivation time)</li>
-    <li>Enter a message, and click "Is signal received" to verify this signal on Taiko</li>
+    <li>Enter a message, and click "Is signal received" to verify this signal on MXC Wannsee</li>
   </ol>
-  <a href="https://taiko.xyz/docs/concepts/bridging/the-signal-service" target="_blank" rel="noreferrer"
-    >Read more about bridging at taiko.xyz ↗</a
+  <a href="https://wannsee.mxc.com/docs/Designs/Bridge" target="_blank" rel="noreferrer"
+    >Read more about bridging at wannsee.mxc.com ↗</a
   >
 </section>
 
 <section>
   <form>
-    <div>Enter a signal to store on Sepolia:</div>
+    <div>Enter a signal to store on Arbitrum Goerli:</div>
     <input type="text" placeholder="A signal..." bind:value={signalToSend} />
     <input type="submit" value="Send signal" on:click={sendSignal} />
   </form>
@@ -141,7 +141,7 @@
 
 <section>
   <form>
-    <div>Enter a signal to check is received on Taiko:</div>
+    <div>Enter a signal to check is received on MXC Wannsee:</div>
     <input type="text" placeholder="A signal..." bind:value={signalToVerify} />
     <input type="submit" value="Is signal received" on:click={isSignalReceived} />
   </form>

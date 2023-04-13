@@ -19,27 +19,27 @@ export const base = {
   },
 } as const satisfies Chain;
 
-export const taiko = {
-  id: 167002,
-  name: "Taiko",
-  network: "askja",
+export const mxc = {
+  id: 5167003,
+  name: "MXC",
+  network: "Wannsee",
   nativeCurrency: {
-    name: "Taiko Ether",
-    symbol: "ETH",
+    name: "Test MXC Token",
+    symbol: "MXC",
     decimals: 18,
   },
   rpcUrls: {
     public: {
-      http: ["https://rpc.a2.taiko.xyz"],
+      http: ["https://wannsee-rpc.mxc.com"],
     },
     default: {
-      http: ["https://rpc.a2.taiko.xyz"],
+      http: ["https://wannsee-rpc.mxc.com"],
     },
   },
   blockExplorers: {
     default: {
       name: "L2 Explorer",
-      url: "https://explorer.a2.taiko.xyz",
+      url: "https://wannsee-explorer.mxc.com",
     },
   },
   testnet: true,

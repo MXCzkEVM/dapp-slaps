@@ -20,7 +20,7 @@
 ## Create your dapp manually
 
 1. Clone/fork the repo:
-   `git clone https://github.com/d1onys1us/dapp-slaps.git`
+   `git clone https://github.com/MXCzkEVM/dapp-slaps.git`
 2. Install packages and copy .env.example files:
    `cd dapp-slaps && sh setup.sh`
 3. Set mnemonic phrase in root `.env` for test accounts ([generate a bip39 mnemonic](https://iancoleman.io/bip39/))
@@ -37,13 +37,8 @@
 
 ## Faucet links
 
-### Sepolia
+- [Receive Ether on Arbitrum Goerli and Test MXC Token on MXC Wannsee](https://wannsee.mxc.com/docs/Tutorials/receive-tokens)
 
-- [Receive Ether on Sepolia](https://sepolia-faucet.pk910.de/)
-
-### Taiko
-
-- [Receive Ether on Taiko](https://taiko.xyz/docs/guides/use-the-bridge#bridge-tokens-from-sepolia-to-taiko)
 
 ## Common app commands
 
@@ -98,6 +93,6 @@ forge script Deploy --broadcast --rpc-url $FOUNDRY && pnpm -F app wagmi
 
 ## Acknowledgements
 - PaulRBerg in general: https://github.com/PaulRBerg
-- Taiko monorepo: https://github.com/taikoxyz/taiko-mono
+- MXC monorepo: https://github.com/MXCzkEVM/mxc-mono
 - Optimism Starter: https://github.com/ethereum-optimism/optimism-starter
 - ScaffoldEth2: https://github.com/scaffold-eth/se-2
